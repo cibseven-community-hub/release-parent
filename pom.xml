@@ -1,0 +1,583 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.cibseven.community</groupId>
+  <artifactId>release-parent</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
+  <name>CIB seven Community - Release Parent Pom</name>
+
+  <description>
+    This pom defines the required plugins and profiles to allow a CIB seven Community projects build.
+  </description>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <!-- Avoid the message "[WARNING] Using platform encoding (UTF-8 actually) ... also for the failsafe plugin -->
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+    <!-- we use Java 11 for our projects -->
+    <version.java>11</version.java>
+    <version.ejb>3.1</version.ejb>
+    
+    <skip.cibseven.release>false</skip.cibseven.release>
+    <skip.central.release>false</skip.central.release>
+	
+    <nexus.snapshot.repository.id>mvn-cibseven-snapshots</nexus.snapshot.repository.id>
+    <nexus.snapshot.repository>https://artifacts.cibseven.org/repository/snapshots</nexus.snapshot.repository>
+	
+    <nexus.release.repository.id>mvn-cibseven-public</nexus.release.repository.id>
+    <nexus.release.repository>https://artifacts.cibseven.org/repository/public</nexus.release.repository>
+
+    <nexus.sonatype.url>https://central.sonatype.com</nexus.sonatype.url>
+	
+    <gpg.useagent>true</gpg.useagent>
+    
+    <plugin.version.clean>3.1.0</plugin.version.clean>
+    <plugin.version.source>3.2.1</plugin.version.source>
+    <plugin.version.compiler>3.6.2</plugin.version.compiler>
+    <!-- for compatibility reasons pinned to 2.6, since 3.0.0 introduced a change incompatible to this build script -->
+    <plugin.version.jar>2.6</plugin.version.jar>
+    <plugin.version.javadoc>3.0.1</plugin.version.javadoc>
+    <plugin.version.maven-bundle>4.1.0</plugin.version.maven-bundle>
+
+    <plugin.version.license>3.0</plugin.version.license>
+    
+    <plugin.version.deploy>2.8.2</plugin.version.deploy>
+    <plugin.version.assembly>3.3.0</plugin.version.assembly>
+    <plugin.version.ejb>3.1.0</plugin.version.ejb>
+    <plugin.version.war>3.3.2</plugin.version.war>
+    <plugin.version.ear>3.2.0</plugin.version.ear>
+    <plugin.version.rar>2.4</plugin.version.rar>
+    <plugin.version.gpg>3.0.1</plugin.version.gpg>
+    <plugin.version.release>2.5.3</plugin.version.release>
+    <plugin.version.central-publishing>0.6.0</plugin.version.central-publishing>
+    
+    <license.inlineHeader>
+Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+under one or more contributor license agreements. See the NOTICE file
+distributed with this work for additional information regarding copyright
+ownership. Camunda licenses this file to you under the Apache License,
+Version 2.0; you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.</license.inlineHeader>
+
+    <!-- Properties for license book generation -->
+    <!-- These properties can be overridden by inheriting modules
+      to generate a list of dependencies (called BOM here) 
+      and attach it as a Maven artifact -->
+      
+    <!-- set to false to generate a third party dependency bom -->
+    <skip-third-party-bom>true</skip-third-party-bom>
+    <!-- set the Maven scopes that should be included in the dependency bom.
+      Must be a pipe-separated (|) list of Maven scopes -->
+    <third-party-bom-scopes>compile</third-party-bom-scopes>
+  </properties>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+      	<plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-clean-plugin</artifactId>
+          <version>${plugin.version.clean}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>${plugin.version.compiler}</version>
+          <configuration>
+            <source>${version.java}</source>
+            <target>${version.java}</target>
+            <release>${version.java}</release>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-jar-plugin</artifactId>
+          <version>${plugin.version.jar}</version>
+          <configuration>
+            <useDefaultManifestFile>true</useDefaultManifestFile>
+            <archive>
+              <!-- explicitly specify manifestFile because otherwise it overrides the generated one from bundle-plugin -->
+              <manifest>
+                <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+              </manifest>
+            </archive>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-war-plugin</artifactId>
+          <version>${plugin.version.war}</version>
+          <configuration>
+            <archive>
+              <manifest>
+                <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+              </manifest>
+            </archive>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-ejb-plugin</artifactId>
+          <version>${plugin.version.ejb}</version>
+          <configuration>
+            <ejbVersion>${version.ejb}</ejbVersion>
+            <archive>
+              <manifest>
+                <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+              </manifest>
+            </archive>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-rar-plugin</artifactId>
+          <version>${plugin.version.rar}</version>
+          <configuration>
+            <archive>
+              <manifest>
+                <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+              </manifest>
+            </archive>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-ear-plugin</artifactId>
+          <version>${plugin.version.ear}</version>
+          <configuration>
+            <archive>
+              <manifest>
+                <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+              </manifest>
+            </archive>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-assembly-plugin</artifactId>
+          <version>${plugin.version.assembly}</version>
+          <configuration>
+            <archive>
+              <manifest>
+                <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+              </manifest>
+            </archive>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-release-plugin</artifactId>
+          <version>${plugin.version.release}</version>
+          <configuration>
+            <mavenExecutorId>forked-path</mavenExecutorId>
+            <useReleaseProfile>false</useReleaseProfile>
+            <arguments>${arguments} -Psonatype-oss-release</arguments>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-deploy-plugin</artifactId>
+          <version>${plugin.version.deploy}</version>
+          <configuration>
+            <skip>${skip.cibseven.release}</skip>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.sonatype.central</groupId>
+          <artifactId>central-publishing-maven-plugin</artifactId>
+          <version>${plugin.version.central-publishing}</version>
+          <configuration>
+            <waitMaxTime>3600</waitMaxTime>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-source-plugin</artifactId>
+          <version>${plugin.version.source}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <version>${plugin.version.javadoc}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-gpg-plugin</artifactId>
+          <version>${plugin.version.gpg}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.felix</groupId>
+          <artifactId>maven-bundle-plugin</artifactId>
+          <version>${plugin.version.maven-bundle}</version>
+          <extensions>true</extensions>
+        </plugin>
+        <!-- define common configuration for license checks -->
+        <!-- license plugin -->
+        <plugin>
+          <groupId>com.mycila</groupId>
+          <artifactId>license-maven-plugin</artifactId>
+          <version>${plugin.version.license}</version>
+          <configuration>
+            <skipExistingHeaders>false</skipExistingHeaders>
+            <includes>
+              <include>**/*.java</include>
+              <include>**/*.sql</include>
+              <include>**/main/**/engine/**/*.xml</include>
+              <include>**/BpmPlatform.xsd</include>
+              <include>**/ProcessApplication.xsd</include>
+            </includes>
+            <excludes>
+              <exclude>**/org/cibseven/bpm/engine/impl/calendar/CronExpression.java</exclude>
+              <exclude>**/org/cibseven/bpm/engine/impl/juel/*.java</exclude>
+              <exclude>**/org/cibseven/bpm/engine/impl/javax/el/*.java</exclude>
+              <exclude>**/org/cibseven/bpm/engine/spring/components/**/*.java</exclude>
+              <exclude>**/org/cibseven/bpm/engine/spring/annotations/*.java</exclude>
+              <exclude>**/org/cibseven/bpm/engine/impl/digest/_apacheCommonsCodec/*.java</exclude>
+              <exclude>**/org/cibseven/bpm/licensecheck/_apacheCommonsCodec/*.java</exclude>
+              <exclude>**/node_modules/**</exclude>
+              <exclude>.mvn/wrapper/MavenWrapperDownloader.java</exclude>
+            </excludes>
+            <mapping>
+              <java>SLASHSTAR_STYLE</java>
+            </mapping>
+          </configuration>
+          <executions>
+            <execution>
+              <id>add-license-header</id>
+              <phase>compile</phase>
+              <goals>
+                <goal>format</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+        <!-- third party license handling -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-shade-plugin</artifactId>
+          <version>3.2.4</version>
+          <configuration>
+            <!-- Whenever we shade dependencies, concatenate their NOTICE files -->
+            <transformers combine.children="append">
+              <transformer implementation="org.apache.maven.plugins.shade.resource.ApacheNoticeResourceTransformer">
+                <addHeader>false</addHeader>
+              </transformer>
+            </transformers>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+    
+    <!-- Plugins used in the context of creating a license book. -->
+    <!-- If activated (see properties), these plugins create a list of 
+      non-Camunda dependencies and attach it as an artifact to the build.
+      The license book generator uses these files to create the book. -->
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>2.8</version>
+        <executions>
+          <execution>
+            <id>list-deps</id>
+            <goals>
+              <goal>list</goal>
+            </goals>
+            <phase>package</phase>
+            <configuration>
+              <skip>${skip-third-party-bom}</skip>
+              <includeScope>test</includeScope><!-- Gives all dependencies; scopes filtering is applied in the ant step -->
+              <sort>true</sort>
+              <excludeGroupIds>org.cibseven</excludeGroupIds>
+              <outputFile>${project.build.directory}/dependencies/dependencies-generated.txt</outputFile>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>1.8</version>
+        <executions>
+          <!-- Reformats the dependency list:
+            - into a plain list (no header line, no indentation)
+            - Filters all dependencies in unwanted scopes -->
+          <execution>
+            <id>reformat-dependencies</id>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <phase>package</phase>
+            <configuration>
+                <skip>${skip-third-party-bom}</skip>
+                <target>
+                  <copy file="${project.build.directory}/dependencies/dependencies-generated.txt" tofile="${project.build.directory}/dependencies.txt">
+                    <filterchain>
+                      <linecontains negate="true"><!-- Remove header line -->
+                        <contains value="The following files have been resolved" />
+                      </linecontains>
+                      <linecontainsregexp><!-- only keep the desired scopes -->
+                        <regexp pattern=":(?:${third-party-bom-scopes})$" />
+                      </linecontainsregexp>
+                      <tokenfilter>
+                        <replaceregex pattern=":(?:${third-party-bom-scopes})$" replace="" /> <!-- Remove scope -->
+                        <trim /><!-- Remove whitespace -->
+                        <ignoreblank />
+                      </tokenfilter>
+                    </filterchain>
+                  </copy>
+                </target>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <version>1.9.1</version>
+        <executions>
+          <!-- Attaches the dependency BOM to the Maven build so
+            that it can be consumed as a Maven artifact in the license book
+            module -->
+          <execution>
+            <id>attach-deps</id>
+            <phase>package</phase>
+            <goals>
+              <goal>attach-artifact</goal>
+            </goals>
+            <configuration>
+              <skipAttach>${skip-third-party-bom}</skipAttach>
+              <artifacts>
+                <artifact>
+                  <file>${project.build.directory}/dependencies.txt</file>
+                  <type>txt</type>
+                  <classifier>third-party-bom</classifier>
+                </artifact>
+              </artifacts>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+  
+  <distributionManagement>
+    <snapshotRepository>
+      <id>${nexus.snapshot.repository.id}</id>
+      <url>${nexus.snapshot.repository}</url>
+    </snapshotRepository>
+    <repository>
+      <id>${nexus.release.repository.id}</id>
+      <url>${nexus.release.repository}</url>
+    </repository>
+  </distributionManagement>
+  
+  <profiles>
+    <profile>
+      <id>override-snapshot-repository</id>
+      <activation>
+        <property>
+          <name>env.NEXUS_SNAPSHOT_REPOSITORY</name>
+        </property>
+      </activation>
+      <properties>
+        <nexus.snapshot.repository>${env.NEXUS_SNAPSHOT_REPOSITORY}</nexus.snapshot.repository>
+      </properties>
+    </profile>
+    <profile>
+      <id>override-snapshot-repository-id</id>
+      <activation>
+        <property>
+          <name>env.NEXUS_SNAPSHOT_REPOSITORY_ID</name>
+        </property>
+      </activation>
+      <properties>
+        <nexus.snapshot.repository.id>${env.NEXUS_SNAPSHOT_REPOSITORY_ID}</nexus.snapshot.repository.id>
+      </properties>
+    </profile>
+    <profile>
+      <id>override-release-repository</id>
+      <activation>
+        <property>
+          <name>env.NEXUS_RELEASE_REPOSITORY</name>
+        </property>
+      </activation>
+      <properties>
+        <nexus.release.repository>${env.NEXUS_RELEASE_REPOSITORY}</nexus.release.repository>
+      </properties>
+    </profile>
+    <profile>
+      <id>override-release-repository-id</id>
+      <activation>
+        <property>
+          <name>env.NEXUS_RELEASE_REPOSITORY_ID</name>
+        </property>
+      </activation>
+      <properties>
+        <nexus.release.repository.id>${env.NEXUS_RELEASE_REPOSITORY_ID}</nexus.release.repository.id>
+      </properties>
+    </profile>
+    <!-- activate this profile to release to maven central -->
+    <profile>
+      <id>sonatype-oss-release</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-source-plugin</artifactId>
+            <version>${plugin.version.source}</version>
+            <executions>
+              <execution>
+                <id>attach-sources</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>jar-no-fork</goal>
+                </goals>
+              </execution>
+              <execution>
+                <id>attach-test-sources</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>test-jar-no-fork</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <version>${plugin.version.javadoc}</version>
+            <configuration>
+              <quiet>false</quiet>
+            </configuration>
+            <executions>
+              <execution>
+                <id>attach-javadocs</id>
+                <goals>
+                  <goal>jar</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <version>${plugin.version.gpg}</version>
+            <configuration>
+              <passphrase>${gpg.passphrase}</passphrase>
+            </configuration>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.sonatype.central</groupId>
+            <artifactId>central-publishing-maven-plugin</artifactId>
+            <extensions>true</extensions>
+            <executions>
+              <execution>
+                <id>central-deploy</id>
+                <phase>deploy</phase>
+                <goals>
+                  <goal>publish</goal>
+                </goals>
+                <configuration>
+                  <deploymentName>${project.groupId}:${project.artifactId}:${project.version}</deploymentName>
+                  <failOnBuildFailure>true</failOnBuildFailure>
+                  <publishingServerId>central</publishingServerId>
+                  <centralBaseUrl>${nexus.sonatype.url}</centralBaseUrl>
+                  <skipPublishing>${skip.central.release}</skipPublishing>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+    </license>
+  </licenses>
+
+  <organization>
+    <name>CIB seven</name>
+    <url>https://cibseven.org</url>
+  </organization>
+  
+  <url>https://cibseven.org</url>
+  
+  <developers>
+    <developer>
+      <id>CIB seven</id>
+      <name>CIB seven Community</name>
+      <organization>CIB seven</organization>
+      <organizationUrl>https://cibseven.org</organizationUrl>
+    </developer>
+  </developers>
+
+  <scm>
+    <url>https://github.com/cibseven/cibseven-release-parent</url>
+    <connection>scm:git:git@github.com:cibseven/cibseven-release-parent.git</connection>
+    <developerConnection>scm:git:git@github.com:cibseven/cibseven-release-parent.git</developerConnection>
+    <tag>HEAD</tag>
+  </scm>
+
+  <issueManagement>
+    <system>GitHub Issues</system>
+    <url>https://github.com/cibseven/cibseven-release-parent/issues</url>
+  </issueManagement>
+
+  <repositories>
+    <repository>
+      <id>maven-central</id>
+      <name>Maven Central</name>
+      <url>https://repo1.maven.org/maven2</url>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+    <repository>
+      <!-- Required for local builds by community users on master branch -->
+      <id>mvn-cibseven-public</id>
+      <name>CIB seven Public Repository</name>
+      <url>https://artifacts.cibseven.org/repository/public</url>
+	  <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+    <repository>
+      <!-- Required for local builds by developers on maintainance branches -->
+      <id>mvn-cibseven-snapshots</id>
+      <name>CIB seven Snapshots repository</name>
+      <url>https://artifacts.cibseven.org/repository/snapshots</url>
+	  <releases>
+        <enabled>false</enabled>
+      </releases>
+	  <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
+
+</project>
