@@ -28,7 +28,7 @@ From a CL, run `mvn` without arguments to invoke the default Maven goal to run a
 
 ## Contributing
 
-Please see our [contribution guidelines](https://github.com/cibseven/cibseven/CONTRIBUTING.md) for how to raise issues and how to contribute code to our project.
+Please see our [contribution guidelines](https://github.com/cibseven/cibseven/blob/main/CONTRIBUTING.md) for how to raise issues and how to contribute code to our project.
 
 ## License
 
