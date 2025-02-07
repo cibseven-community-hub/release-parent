@@ -1,6 +1,9 @@
 CIB seven Community Release Parent
 ===================
 
+[![License](https://img.shields.io/github/license/cibseven/cibseven?color=blue&logo=apache)](https://github.com/cibseven-community-hub/release-parent/blob/master/LICENSE)
+[![Discussions](https://img.shields.io/badge/discussions-cibseven-green)](https://github.com/orgs/cibseven/discussions)
+ 
 ## cibseven-community-release-parent
 
 The CIB seven Community Release Parent POM provides common settings for all CIB seven Community projects and components.
