@@ -137,6 +137,7 @@ pipeline {
                                 -Psonatype-oss-release \
                                 -Dskip.cibseven.release=false \
                                 -DskipTests \
+                                -Dgpg.keyname="CIB seven community <community@cibseven.org>" \
                                 -Dgpg.passphrase=${params.DEPLOY_MAVEN_CENTRAL_PASSWORD}
                         """
                     }
