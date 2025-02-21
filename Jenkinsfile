@@ -45,6 +45,16 @@ pipeline {
             defaultValue: '',
             description: 'Enter a password for deployment to Maven Central (no need to activate DEPLOY parameter above if you want just to deploy to Maven Central). SNAPSHOT version will not be deployed into Maven Central. If you will not change this value - you will not run deploy to Maven Central.'
         )
+        string(
+            name: 'COMMUNITY_USERNAME',
+            defaultValue: '',
+            description: 'Community username for publishing to Maven Central'
+        )
+        password(
+            name: 'COMMUNITY_PASSWORD',
+            defaultValue: '',
+            description: 'Community password for publishing to Maven Central'
+        )
         text(
             name: 'GPG_KEY_CONTENT',
             defaultValue: '',
@@ -155,7 +165,11 @@ pipeline {
                     
                     withMaven(options: []) {
                         sh """
+                            export 
                             mvn -T4 -U \
+                                --Dcommunity.username=${params.COMMUNITY_USERNAME} \
+                                --Dcommunity.password=${params.COMMUNITY_PASSWORD} \
+                                --global-settings settings.xml \
                                 clean deploy \
                                 -Psonatype-oss-release \
                                 -Dskip.cibseven.release=true \
