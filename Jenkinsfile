@@ -167,14 +167,14 @@ pipeline {
                         sh """
                             export 
                             mvn -T4 -U \
-                                -Dcommunity.username=${params.COMMUNITY_USERNAME} \
-                                -Dcommunity.password=${params.COMMUNITY_PASSWORD} \
+                                -Dcommunity.username="${params.COMMUNITY_USERNAME}" \
+                                -Dcommunity.password="${params.COMMUNITY_PASSWORD}" \
                                 --global-settings settings.xml \
                                 clean deploy \
                                 -Psonatype-oss-release \
                                 -Dskip.cibseven.release=true \
                                 -DskipTests \
-                                -Dgpg.passphrase=${params.DEPLOY_MAVEN_CENTRAL_PASSWORD} \
+                                -Dgpg.passphrase="${params.DEPLOY_MAVEN_CENTRAL_PASSWORD}" \
                                 -Dgpg.keyname=\$(gpg --list-keys --with-colons | grep pub | cut -d: -f5)
                         """
                     }
