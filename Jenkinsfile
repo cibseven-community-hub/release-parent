@@ -158,10 +158,12 @@ pipeline {
                         error "GPG key content parameter is required for Maven Central deployment"
                     }
                     
-                    // Write the key to a temporary file
-                    sh "echo '\${params.GPG_KEY_CONTENT}' | base64 --decode > /tmp/gpg-key.asc"
-                    sh "gpg --batch --import /tmp/gpg-key.asc"
-                    sh "rm -f /tmp/gpg-key.asc"
+                    withCredentials([string(credentialsId: 'GPG_KEY_ID', variable: 'GPG_KEY_CONTENT')]) {
+                        // Write the key to a temporary file
+                        sh "echo '\${params.GPG_KEY_CONTENT}' | base64 --decode > /tmp/gpg-key.asc"
+                        sh "gpg --batch --import /tmp/gpg-key.asc"
+                        sh "rm -f /tmp/gpg-key.asc" // Clean up after use
+                    }
                     
                     withMaven(options: []) {
                         sh """
