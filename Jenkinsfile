@@ -45,7 +45,7 @@ pipeline {
             defaultValue: '',
             description: 'Enter a password for deployment to Maven Central (no need to activate DEPLOY parameter above if you want just to deploy to Maven Central). SNAPSHOT version will not be deployed into Maven Central. If you will not change this value - you will not run deploy to Maven Central.'
         )
-        password(
+        text(
             name: 'GPG_KEY_CONTENT',
             defaultValue: '',
             description: 'GPG private key content for signing Maven Central deployment (paste the entire private key including headers)'
