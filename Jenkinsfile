@@ -125,7 +125,25 @@ pipeline {
                 }
             }
         }
+        
+        stage('Import GPG Key') {
+            steps {
+                script {
+                    def gpgKey = params.GPG_KEY_CONTENT
 
+                    // Write the key to a temporary file
+                    def keyFile = "/tmp/gpg-key.asc"
+                    writeFile file: keyFile, text: gpgKey
+
+                    // Import the key
+                    sh """
+                        gpg --batch --import ${keyFile}
+                        rm -f ${keyFile}
+                    """
+                }
+            }
+        }
+        
         stage('Deploy to Maven Central') {
             when {
                 allOf {
@@ -140,10 +158,16 @@ pipeline {
                         error "GPG key content parameter is required for Maven Central deployment"
                     }
                     
-                    // Import the GPG key from parameter
+                    def gpgKey = params.GPG_KEY_CONTENT
+
+                    // Write the key to a temporary file
+                    def keyFile = "/tmp/gpg-key.asc"
+                    writeFile file: keyFile, text: gpgKey
+
+                    // Import the key
                     sh """
-                        echo "\${GPG_KEY_CONTENT}" | gpg --batch --yes --import
-                        gpg --list-keys
+                        gpg --batch --import ${keyFile}
+                        rm -f ${keyFile}
                     """
                     withMaven(options: []) {
                         sh """
@@ -152,8 +176,7 @@ pipeline {
                                 -Psonatype-oss-release \
                                 -Dskip.cibseven.release=false \
                                 -DskipTests \
-                                -Dgpg.keyname="CIB seven community <community@cibseven.org>" \
-                                -Dgpg.passphrase=${params.DEPLOY_MAVEN_CENTRAL_PASSWORD}
+                                -Dgpg.passphrase=${params.DEPLOY_MAVEN_CENTRAL_PASSWORD} \
                                 -Dgpg.keyname=\$(gpg --list-keys --with-colons | grep pub | cut -d: -f5)
                         """
                     }
