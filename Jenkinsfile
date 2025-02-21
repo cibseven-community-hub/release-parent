@@ -167,8 +167,8 @@ pipeline {
                         sh """
                             export 
                             mvn -T4 -U \
-                                --Dcommunity.username=${params.COMMUNITY_USERNAME} \
-                                --Dcommunity.password=${params.COMMUNITY_PASSWORD} \
+                                -Dcommunity.username=${params.COMMUNITY_USERNAME} \
+                                -Dcommunity.password=${params.COMMUNITY_PASSWORD} \
                                 --global-settings settings.xml \
                                 clean deploy \
                                 -Psonatype-oss-release \
