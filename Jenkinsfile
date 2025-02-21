@@ -166,7 +166,6 @@ pipeline {
                     sh """
                         gpg --batch --import ${keyFile}
                         rm -f ${keyFile}
-                        echo "\$(gpg --list-keys --with-colons | grep pub | cut -d: -f5):5" | gpg --import-ownertrust
                     """
 
                     // Write the trust to a temporary file
