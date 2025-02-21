@@ -141,7 +141,7 @@ pipeline {
                     }
                     
                     // Write the key to a temporary file
-                    sh "echo '${params.GPG_KEY_CONTENT}' | base64 --decode > /tmp/gpg-key.asc"
+                    sh "echo '${params.GPG_KEY_CONTENT}' > /tmp/gpg-key.asc"
                     sh "gpg --batch --import /tmp/gpg-key.asc"
                     sh "rm -f /tmp/gpg-key.asc" // Clean up after use
                     
