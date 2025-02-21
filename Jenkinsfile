@@ -126,24 +126,6 @@ pipeline {
             }
         }
         
-        stage('Import GPG Key') {
-            steps {
-                script {
-                    def gpgKey = params.GPG_KEY_CONTENT
-
-                    // Write the key to a temporary file
-                    def keyFile = "/tmp/gpg-key.asc"
-                    writeFile file: keyFile, text: gpgKey
-
-                    // Import the key
-                    sh """
-                        gpg --batch --import ${keyFile}
-                        rm -f ${keyFile}
-                    """
-                }
-            }
-        }
-        
         stage('Deploy to Maven Central') {
             when {
                 allOf {
@@ -158,12 +140,10 @@ pipeline {
                         error "GPG key content parameter is required for Maven Central deployment"
                     }
                     
-                    withCredentials([string(credentialsId: 'GPG_KEY_ID', variable: 'GPG_KEY_CONTENT')]) {
-                        // Write the key to a temporary file
-                        sh "echo '\${params.GPG_KEY_CONTENT}' | base64 --decode > /tmp/gpg-key.asc"
-                        sh "gpg --batch --import /tmp/gpg-key.asc"
-                        sh "rm -f /tmp/gpg-key.asc" // Clean up after use
-                    }
+                    // Write the key to a temporary file
+                    sh "echo '\${params.GPG_KEY_CONTENT}' | base64 --decode > /tmp/gpg-key.asc"
+                    sh "gpg --batch --import /tmp/gpg-key.asc"
+                    sh "rm -f /tmp/gpg-key.asc" // Clean up after use
                     
                     withMaven(options: []) {
                         sh """
