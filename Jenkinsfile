@@ -140,11 +140,14 @@ pipeline {
                         error "GPG key content parameter is required for Maven Central deployment"
                     }
                     
-                    // Import the GPG key from parameter
-                    sh """
-                        echo "\${GPG_KEY_CONTENT}" | gpg --import
+                    // Import the GPG key from parameter using heredoc
+                    sh '''
+                        cat << EOF | gpg --import
+                        ${GPG_KEY_CONTENT}
+                        EOF
+                        
                         gpg --list-keys
-                    """
+                    '''
                     withMaven(options: []) {
                         sh """
                             mvn -T4 -U \
