@@ -135,15 +135,23 @@ pipeline {
             }
             steps {
                 script {
+                   
                     // Check if GPG key content parameter exists
-                    if (!params.GPG_KEY_CONTENT) {
+                    if (params.GPG_KEY_CONTENT.toString().isEmpty()) {
                         error "GPG key content parameter is required for Maven Central deployment"
                     }
                     
+                    def gpgKey = params.GPG_KEY_CONTENT.toString()
+    
                     // Write the key to a temporary file
-                    sh "echo '${params.GPG_KEY_CONTENT}' > /tmp/gpg-key.asc"
-                    sh "gpg --batch --import /tmp/gpg-key.asc"
-                    sh "rm -f /tmp/gpg-key.asc" // Clean up after use
+                    def keyFile = "./gpg-key.asc"
+                    writeFile file: keyFile, text: gpgKey
+    
+                    // Import the key
+                    sh """
+                        gpg --batch --import ${keyFile}
+                        rm -f ${keyFile}
+                    """
                     
                     withMaven(options: []) {
                         sh """
