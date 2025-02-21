@@ -130,15 +130,24 @@ pipeline {
             }
             steps {
                 script {
-                    withMaven(options: []) {
+                    withCredentials([file(credentialsId: 'maven-gpg-private-key', variable: 'GPG_KEY_FILE')]) {
+                        // Import the GPG key
                         sh """
-                            mvn -T4 -U \
-                                clean deploy \
-                                -Psonatype-oss-release \
-                                -Dskip.cibseven.release=false \
-                                -DskipTests \
-                                -Dgpg.passphrase=${params.DEPLOY_MAVEN_CENTRAL_PASSWORD}
+                            gpg --import ${GPG_KEY_FILE}
+                            gpg --list-keys
                         """
+                        
+                        withMaven(options: []) {
+                            sh """
+                                mvn -T4 -U \
+                                    clean deploy \
+                                    -Psonatype-oss-release \
+                                    -Dskip.cibseven.release=false \
+                                    -DskipTests \
+                                    -Dgpg.passphrase=${params.DEPLOY_MAVEN_CENTRAL_PASSWORD} \
+                                    -Dgpg.keyname=\$(gpg --list-keys --with-colons | grep pub | cut -d: -f5)
+                            """
+                        }
                     }
                 }
             }
