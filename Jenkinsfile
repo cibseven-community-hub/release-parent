@@ -134,9 +134,18 @@ pipeline {
             }
             steps {
                 script {
+                    // Check if GPG key file parameter exists
+                    if (!params.GPG_KEY_FILE) {
+                        error "GPG key file parameter is required for Maven Central deployment"
+                    }
+                    
                     // Import the GPG key from parameter
                     sh """
-                        gpg --import ${params.GPG_KEY_FILE}
+                        if [ ! -f "${params.GPG_KEY_FILE}" ]; then
+                            echo "GPG key file not found: ${params.GPG_KEY_FILE}"
+                            exit 1
+                        fi
+                        gpg --import "${params.GPG_KEY_FILE}"
                         gpg --list-keys
                     """
                         
