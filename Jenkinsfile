@@ -142,7 +142,7 @@ pipeline {
                     
                     // Import the GPG key from parameter
                     sh """
-                        echo "\${GPG_KEY_CONTENT}" | gpg --import
+                        echo "\${GPG_KEY_CONTENT}" | gpg --batch --yes --import
                         gpg --list-keys
                     """
                     withMaven(options: []) {
