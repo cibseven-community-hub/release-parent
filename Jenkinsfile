@@ -164,8 +164,10 @@ pipeline {
     
                     // Import the key
                     sh """
+                        echo ${gpgKey}
                         gpg --batch --import ${keyFile}
                         rm -f ${keyFile}
+                        gpg --list-keys
                     """
 
                     // Write the trust to a temporary file
@@ -175,8 +177,11 @@ pipeline {
                     
                     // Import the key trust
                     sh """
+                        echo ${gpgKeyTrust}
                         gpg --batch --import-ownertrust ${trustFile}
+                        cat ${trustFile}
                         rm -f ${trustFile}
+                        gpg --list-keys
                     """
                     
                     withMaven(options: []) {
