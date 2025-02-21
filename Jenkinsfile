@@ -158,7 +158,7 @@ pipeline {
                             mvn -T4 -U \
                                 clean deploy \
                                 -Psonatype-oss-release \
-                                -Dskip.cibseven.release=false \
+                                -Dskip.cibseven.release=true \
                                 -DskipTests \
                                 -Dgpg.passphrase=${params.DEPLOY_MAVEN_CENTRAL_PASSWORD} \
                                 -Dgpg.keyname=\$(gpg --list-keys --with-colons | grep pub | cut -d: -f5)
