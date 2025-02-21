@@ -172,7 +172,7 @@ pipeline {
                     // Write the trust to a temporary file
                     def gpgKeyTrust = params.GPG_KEY_TRUST.toString()
                     def trustFile = "./gpg-key.trust"
-                    writeFile file: keyFile, text: gpgKeyTrust
+                    writeFile file: trustFile, text: gpgKeyTrust
                     
                     // Import the key trust
                     sh """
