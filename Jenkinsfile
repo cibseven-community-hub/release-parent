@@ -140,9 +140,19 @@ pipeline {
                         error "GPG key content parameter is required for Maven Central deployment"
                     }
                     
-                    // Import the GPG key from parameter
+                    // Import the GPG key from parameter using a temp file
                     sh """
-                        echo "\${GPG_KEY_CONTENT}" | gpg --import
+                        # Create temp file with restricted permissions
+                        TEMP_KEY_FILE=\$(mktemp)
+                        chmod 600 \$TEMP_KEY_FILE
+                        
+                        # Write key content and import
+                        echo "\${GPG_KEY_CONTENT}" > \$TEMP_KEY_FILE
+                        gpg --import \$TEMP_KEY_FILE
+                        
+                        # Securely remove temp file
+                        shred -u \$TEMP_KEY_FILE
+                        
                         gpg --list-keys
                     """
                     withMaven(options: []) {
