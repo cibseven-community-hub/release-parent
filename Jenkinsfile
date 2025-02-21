@@ -45,9 +45,10 @@ pipeline {
             defaultValue: '',
             description: 'Enter a password for deployment to Maven Central (no need to activate DEPLOY parameter above if you want just to deploy to Maven Central). SNAPSHOT version will not be deployed into Maven Central. If you will not change this value - you will not run deploy to Maven Central.'
         )
-        file(
-            name: 'GPG_KEY_FILE',
-            description: 'GPG private key file for signing Maven Central deployment'
+        password(
+            name: 'GPG_KEY_CONTENT',
+            defaultValue: '',
+            description: 'GPG private key content for signing Maven Central deployment (paste the entire private key including headers)'
         )
     }
 
@@ -134,18 +135,14 @@ pipeline {
             }
             steps {
                 script {
-                    // Check if GPG key file parameter exists
-                    if (!params.GPG_KEY_FILE) {
-                        error "GPG key file parameter is required for Maven Central deployment"
+                    // Check if GPG key content parameter exists
+                    if (!params.GPG_KEY_CONTENT) {
+                        error "GPG key content parameter is required for Maven Central deployment"
                     }
                     
                     // Import the GPG key from parameter
                     sh """
-                        if [ ! -f "${params.GPG_KEY_FILE}" ]; then
-                            echo "GPG key file not found: ${params.GPG_KEY_FILE}"
-                            exit 1
-                        fi
-                        gpg --import "${params.GPG_KEY_FILE}"
+                        echo "\${GPG_KEY_CONTENT}" | gpg --import
                         gpg --list-keys
                     """
                     withMaven(options: []) {
