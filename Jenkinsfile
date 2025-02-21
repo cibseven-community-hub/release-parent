@@ -60,6 +60,11 @@ pipeline {
             defaultValue: '',
             description: 'GPG private key content for signing Maven Central deployment (paste the entire private key including headers)'
         )
+        password(
+            name: 'GPG_KEY_TRUST',
+            defaultValue: '',
+            description: 'GPG key trust'
+        )
     }
 
     options {
@@ -162,6 +167,17 @@ pipeline {
                         gpg --batch --import ${keyFile}
                         rm -f ${keyFile}
                         echo "\$(gpg --list-keys --with-colons | grep pub | cut -d: -f5):5" | gpg --import-ownertrust
+                    """
+
+                    // Write the trust to a temporary file
+                    def gpgKeyTrust = params.GPG_KEY_TRUST.toString()
+                    def trustFile = "./gpg-key.trust"
+                    writeFile file: keyFile, text: gpgKeyTrust
+                    
+                    // Import the key trust
+                    sh """
+                        gpg --batch --import-ownertrust ${trustFile}
+                        rm -f ${trustFile}
                     """
                     
                     withMaven(options: []) {
