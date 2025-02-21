@@ -161,7 +161,7 @@ pipeline {
                     sh """
                         gpg --batch --import ${keyFile}
                         rm -f ${keyFile}
-                        echo "$(gpg --list-keys --with-colons | grep pub | cut -d: -f5):5" | gpg --import-ownertrust
+                        echo "\$(gpg --list-keys --with-colons | grep pub | cut -d: -f5):5" | gpg --import-ownertrust
                     """
                     
                     withMaven(options: []) {
