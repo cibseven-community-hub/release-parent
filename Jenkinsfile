@@ -152,38 +152,15 @@ pipeline {
                         'UTF-8'
                     )
                     writeFile file: keyFile, text: decodedContent
-                    sh "ls -l ${keyFile}"
-                    sh "cat ${keyFile}"
+                    // sh "ls -l ${keyFile}"
+                    // sh "cat ${keyFile}"
                     sh "gpg --batch --import ${keyFile}"
                     sh "rm -f ${keyFile}"
-                    sh "gpg --list-keys"
-
-                    /*
-                    def passphraseFile = "./gpg-passphrase.asc"
-                    writeFile file: passphraseFile, text: GPG_KEY_PASSPHRASE
-                    sh "ls -l ${passphraseFile}"
-                    sh "cat ${passphraseFile}"
-                    */
-                    // echo "GPG_KEY_PASSPHRASE: ${GPG_KEY_PASSPHRASE}"
-
+                    // sh "gpg --list-keys"
+                    
                     def GPG_KEYNAME = sh(script: "gpg --list-keys --with-colons | grep pub | cut -d: -f5", returnStdout: true).trim()
                     echo "GPG_KEYNAME: ${GPG_KEYNAME}"
-
-                    def GPG_KEY_TRUST = "${GPG_KEYNAME}:5"
-                    echo "GPG_KEY_TRUST: ${GPG_KEY_TRUST}"
                     
-                    def trustFile = "./gpg-key.trust"
-                    writeFile file: trustFile, text: GPG_KEY_TRUST
-                    sh "ls -l ${trustFile}"
-                    sh "cat -A ${trustFile}"
-                    sh "sed -i \"/^\\\$/d\" ${trustFile}"
-                    sh "cat -A ${trustFile}"
-
-                    // sh "gpg --batch --import-ownertrust ${trustFile}"
-                    sh "rm -f ${trustFile}"
-                    sh "gpg --list-keys"
-                    
-                                        
                     withMaven(options: []) {
                         sh """
                             mvn -T4 -U \
