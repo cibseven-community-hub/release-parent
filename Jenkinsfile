@@ -180,7 +180,7 @@ pipeline {
                     sh "rm -f ${trustFile}"
                     sh "gpg --list-keys"
 
-                    def GPG_KEYNAME = "$(gpg --list-keys --with-colons | grep pub | cut -d: -f5)"
+                    def GPG_KEYNAME = sh(script: "gpg --list-keys --with-colons | grep pub | cut -d: -f5", returnStdout: true).trim()
                     echo "GPG_KEYNAME: ${GPG_KEYNAME}"
                                         
                     withMaven(options: []) {
