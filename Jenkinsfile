@@ -179,7 +179,7 @@ pipeline {
                     sh "sed -i \"/^\\\$/d\" ${trustFile}"
                     sh "cat -A ${trustFile}"
 
-                    sh "gpg --batch --import-ownertrust ${trustFile}"
+                    // sh "gpg --batch --import-ownertrust ${trustFile}"
                     sh "rm -f ${trustFile}"
                     sh "gpg --list-keys"
                     
