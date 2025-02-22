@@ -55,10 +55,10 @@ pipeline {
             defaultValue: '',
             description: 'Community password for publishing to Maven Central'
         )
-        text(
-            name: 'GPG_KEY_CONTENT',
+        file(
+            name: 'GPG_KEY_FILE',
             defaultValue: '',
-            description: 'GPG private key content for signing Maven Central deployment (paste the entire private key including headers)'
+            description: 'GPG private key file for signing Maven Central deployment'
         )
         password(
             name: 'GPG_KEY_TRUST',
@@ -156,15 +156,13 @@ pipeline {
                         error "GPG key content parameter is required for Maven Central deployment"
                     }
                     
-                    def gpgKey = params.GPG_KEY_CONTENT.toString()
-    
                     // Write the key to a temporary file
                     def keyFile = "./gpg-key.asc"
-                    writeFile file: keyFile, text: gpgKey
+                    writeFile file: keyFile, text: readFile(params.GPG_KEY_FILE)
     
                     // Import the key
                     sh """
-                        echo ${gpgKey}
+                        cat ${keyFile}
                         gpg --batch --import ${keyFile}
                         rm -f ${keyFile}
                         gpg --list-keys
