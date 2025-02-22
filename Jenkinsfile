@@ -174,7 +174,9 @@ pipeline {
                     def trustFile = "./gpg-key.trust"
                     writeFile file: trustFile, text: GPG_KEY_TRUST
                     sh "ls -l ${trustFile}"
-                    sh "cat ${trustFile}"
+                    sh "cat -A ${trustFile}"
+                    sh "sed -i 's/\r$//' ${trustFile}"
+                    sh "cat -A ${trustFile}"
 
                     sh "gpg --batch --import-ownertrust ${trustFile}"
                     sh "rm -f ${trustFile}"
