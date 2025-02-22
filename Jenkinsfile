@@ -152,14 +152,10 @@ pipeline {
                         'UTF-8'
                     )
                     writeFile file: keyFile, text: decodedContent
-                    // sh "ls -l ${keyFile}"
-                    // sh "cat ${keyFile}"
                     sh "gpg --batch --import ${keyFile}"
                     sh "rm -f ${keyFile}"
-                    // sh "gpg --list-keys"
                     
                     def GPG_KEYNAME = sh(script: "gpg --list-keys --with-colons | grep pub | cut -d: -f5", returnStdout: true).trim()
-                    echo "GPG_KEYNAME: ${GPG_KEYNAME}"
                     
                     withMaven(options: []) {
                         sh """
