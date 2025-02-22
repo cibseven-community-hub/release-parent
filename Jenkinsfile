@@ -167,7 +167,7 @@ pipeline {
                                 --global-settings settings.xml \
                                 clean deploy \
                                 -Psonatype-oss-release \
-                                -Dskip.cibseven.release=true \
+                                -Dskip.cibseven.release=false \
                                 -DskipTests
                         """
                     }
