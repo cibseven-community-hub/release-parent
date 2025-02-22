@@ -50,11 +50,6 @@ pipeline {
             defaultValue: '',
             description: 'Base64 encoded GPG key content'
         )
-        password(
-            name: 'GPG_KEY_TRUST',
-            defaultValue: '',
-            description: 'GPG key trust'
-        )
         string(
             name: 'COMMUNITY_USERNAME',
             defaultValue: '',
@@ -169,21 +164,23 @@ pipeline {
                     sh "ls -l ${passphraseFile}"
                     sh "cat ${passphraseFile}"
                     */
-                    echo "GPG_KEY_PASSPHRASE: ${GPG_KEY_PASSPHRASE}"
+                    // echo "GPG_KEY_PASSPHRASE: ${GPG_KEY_PASSPHRASE}"
+
+                    def GPG_KEYNAME = sh(script: "gpg --list-keys --with-colons | grep pub | cut -d: -f5", returnStdout: true).trim()
+                    echo "GPG_KEYNAME: ${GPG_KEYNAME}"
+
+                    def GPG_KEY_TRUST = "${GPG_KEYNAME}:5"
+                    echo "GPG_KEY_TRUST: ${GPG_KEY_TRUST}"
                     
                     def trustFile = "./gpg-key.trust"
                     writeFile file: trustFile, text: GPG_KEY_TRUST
                     sh "ls -l ${trustFile}"
                     sh "cat -A ${trustFile}"
-                    sh "sed -i 's/\r$//' ${trustFile}"
-                    sh "cat -A ${trustFile}"
 
                     sh "gpg --batch --import-ownertrust ${trustFile}"
                     sh "rm -f ${trustFile}"
                     sh "gpg --list-keys"
-
-                    def GPG_KEYNAME = sh(script: "gpg --list-keys --with-colons | grep pub | cut -d: -f5", returnStdout: true).trim()
-                    echo "GPG_KEYNAME: ${GPG_KEYNAME}"
+                    
                                         
                     withMaven(options: []) {
                         sh """
