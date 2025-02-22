@@ -32,7 +32,7 @@ pipeline {
     parameters {
         booleanParam(
             name: 'INSTALL',
-            defaultValue: true,
+            defaultValue: false,
             description: 'Build and test'
         )
         booleanParam(
@@ -41,9 +41,19 @@ pipeline {
             description: 'Deploy artifacts to artifacts.cibseven.org'
         )
         password(
-            name: 'DEPLOY_MAVEN_CENTRAL_PASSWORD',
+            name: 'GPG_KEY_PASSPHRASE',
             defaultValue: '',
-            description: 'Enter a password for deployment to Maven Central (no need to activate DEPLOY parameter above if you want just to deploy to Maven Central). SNAPSHOT version will not be deployed into Maven Central. If you will not change this value - you will not run deploy to Maven Central.'
+            description: 'Enter a gpg passphrase for deployment to Maven Central (no need to activate DEPLOY parameter above if you want just to deploy to Maven Central). SNAPSHOT version will not be deployed into Maven Central. If you will not change this value - you will not run deploy to Maven Central.'
+        )
+        password(
+            name: 'GPG_KEY_CONTENT',
+            defaultValue: '',
+            description: 'Base64 encoded GPG key content'
+        )
+        password(
+            name: 'GPG_KEY_TRUST',
+            defaultValue: '',
+            description: 'GPG key trust'
         )
         string(
             name: 'COMMUNITY_USERNAME',
@@ -54,15 +64,6 @@ pipeline {
             name: 'COMMUNITY_PASSWORD',
             defaultValue: '',
             description: 'Community password for publishing to Maven Central'
-        )
-        file(
-            name: 'GPG_KEY_FILE',
-            description: 'GPG private key file for signing Maven Central deployment'
-        )
-        password(
-            name: 'GPG_KEY_TRUST',
-            defaultValue: '',
-            description: 'GPG key trust'
         )
     }
 
@@ -143,85 +144,57 @@ pipeline {
         stage('Deploy to Maven Central') {
             when {
                 allOf {
-                    expression { params.DEPLOY_MAVEN_CENTRAL_PASSWORD.toString().isEmpty() == false } // "" is default value
+                    expression { params.GPG_KEY_PASSPHRASE.toString().isEmpty() == false } // "" is default value
                     expression { mavenProjectInformation.version.endsWith("-SNAPSHOT") == false }
                 }
             }
             steps {
                 script {
-                   
-                    // Check if GPG key content parameter exists
-                    // if (!params.GPG_KEY_FILE) {
-                    //    error "GPG key file parameter is required for Maven Central deployment"
-                    // }
 
-                    sh "echo Before"
-                    sh "echo ${params.GPG_KEY_FILE}"
-                    sh "echo After"
-
-                    // Safely handle the file parameter
-                    def fileContent = null
-                    
-                    // Check if we're running on master/controller node
-                    node('built-in') {
-                        // Read the file content using workspace-relative path
-                        fileContent = readFile(file: "${env.WORKSPACE}/${params.GPG_KEY_FILE}")
-                    }
-
-                    // Write the key to a temporary file
                     def keyFile = "./gpg-key.asc"
+                    def decodedContent = new String(
+                        java.util.Base64.decoder.decode(GPG_KEY_CONTENT),
+                        'UTF-8'
+                    )
+                    writeFile file: keyFile, text: decodedContent
+                    sh "ls -l ${keyFile}"
+                    sh "cat ${keyFile}"
+                    sh "gpg --batch --import ${keyFile}"
+                    sh "rm -f ${keyFile}"
+                    sh "gpg --list-keys"
 
-                    if (fileContent != null) {
-                        writeFile file: keyFile, text: fileContent
-
-                        // Print confirmation
-                        echo "File has been written to ${keyFile}"
-                        
-                        // Optionally verify the file contents
-                        sh "cat ${keyFile}"
-                        
-                    } else {
-                        error "Failed to read key file content"
-                    }
+                    /*
+                    def passphraseFile = "./gpg-passphrase.asc"
+                    writeFile file: passphraseFile, text: GPG_KEY_PASSPHRASE
+                    sh "ls -l ${passphraseFile}"
+                    sh "cat ${passphraseFile}"
+                    */
+                    echo "GPG_KEY_PASSPHRASE: ${GPG_KEY_PASSPHRASE}"
                     
-                    
-                    
-    
-                    // Import the key
-                    sh """
-                        cat ${keyFile}
-                        gpg --batch --import ${keyFile}
-                        rm -f ${keyFile}
-                        gpg --list-keys
-                    """
-
-                    // Write the trust to a temporary file
-                    def gpgKeyTrust = params.GPG_KEY_TRUST.toString()
                     def trustFile = "./gpg-key.trust"
-                    writeFile file: trustFile, text: gpgKeyTrust
-                    
-                    // Import the key trust
-                    sh """
-                        echo ${gpgKeyTrust}
-                        gpg --batch --import-ownertrust ${trustFile}
-                        cat ${trustFile}
-                        rm -f ${trustFile}
-                        gpg --list-keys
-                    """
-                    
+                    writeFile file: trustFile, text: GPG_KEY_TRUST
+                    sh "ls -l ${trustFile}"
+                    sh "cat ${trustFile}"
+
+                    sh "gpg --batch --import-ownertrust ${trustFile}"
+                    sh "rm -f ${trustFile}"
+                    sh "gpg --list-keys"
+
+                    def GPG_KEYNAME = "$(gpg --list-keys --with-colons | grep pub | cut -d: -f5)"
+                    echo "GPG_KEYNAME: ${GPG_KEYNAME}"
+                                        
                     withMaven(options: []) {
                         sh """
-                            export 
                             mvn -T4 -U \
+                                -Dgpg.keyname="${GPG_KEYNAME}" \
+                                -Dgpg.passphrase="${params.GPG_KEY_PASSPHRASE}" \
                                 -Dcommunity.username="${params.COMMUNITY_USERNAME}" \
                                 -Dcommunity.password="${params.COMMUNITY_PASSWORD}" \
                                 --global-settings settings.xml \
                                 clean deploy \
                                 -Psonatype-oss-release \
                                 -Dskip.cibseven.release=true \
-                                -DskipTests \
-                                -Dgpg.passphrase="${params.DEPLOY_MAVEN_CENTRAL_PASSWORD}" \
-                                -Dgpg.keyname=\$(gpg --list-keys --with-colons | grep pub | cut -d: -f5)
+                                -DskipTests
                         """
                     }
                 }
