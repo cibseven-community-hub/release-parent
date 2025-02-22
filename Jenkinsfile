@@ -151,9 +151,9 @@ pipeline {
                 script {
                    
                     // Check if GPG key content parameter exists
-                    if (!params.GPG_KEY_FILE) {
-                        error "GPG key file parameter is required for Maven Central deployment"
-                    }
+                    // if (!params.GPG_KEY_FILE) {
+                    //    error "GPG key file parameter is required for Maven Central deployment"
+                    // }
                     
                     // Write the key to a temporary file
                     def keyFile = "./gpg-key.asc"
