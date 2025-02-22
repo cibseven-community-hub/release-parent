@@ -57,7 +57,6 @@ pipeline {
         )
         file(
             name: 'GPG_KEY_FILE',
-            defaultValue: '',
             description: 'GPG private key file for signing Maven Central deployment'
         )
         password(
