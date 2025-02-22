@@ -155,11 +155,37 @@ pipeline {
                     //    error "GPG key file parameter is required for Maven Central deployment"
                     // }
 
+                    sh "echo Before"
                     sh "echo ${params.GPG_KEY_FILE}"
+                    sh "echo After"
+
+                    // Safely handle the file parameter
+                    def fileContent = null
                     
+                    // Check if we're running on master/controller node
+                    node('built-in') {
+                        // Read the file content using workspace-relative path
+                        fileContent = readFile(file: "${env.WORKSPACE}/${params.GPG_KEY_FILE}")
+                    }
+
                     // Write the key to a temporary file
                     def keyFile = "./gpg-key.asc"
-                    writeFile file: keyFile, text: readFile(params.GPG_KEY_FILE)
+
+                    if (fileContent != null) {
+                        writeFile file: keyFile, text: fileContent
+
+                        // Print confirmation
+                        echo "File has been written to ${keyFile}"
+                        
+                        // Optionally verify the file contents
+                        sh "cat ${keyFile}"
+                        
+                    } else {
+                        error "Failed to read key file content"
+                    }
+                    
+                    
+                    
     
                     // Import the key
                     sh """
