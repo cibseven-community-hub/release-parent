@@ -176,7 +176,7 @@ pipeline {
                     writeFile file: trustFile, text: GPG_KEY_TRUST
                     sh "ls -l ${trustFile}"
                     sh "cat -A ${trustFile}"
-                    sh "sed -i '/^$/d' ${trustFile}"
+                    sh "sed -i \"/^\\\$/d\" ${trustFile}"
                     sh "cat -A ${trustFile}"
 
                     sh "gpg --batch --import-ownertrust ${trustFile}"
