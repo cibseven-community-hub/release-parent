@@ -36,7 +36,7 @@ pipeline {
             description: 'Build and test'
         )
         booleanParam(
-            name: 'DEPLOY',
+            name: 'DEPLOY_TO_ARTIFACTS',
             defaultValue: false,
             description: 'Deploy artifacts to artifacts.cibseven.org'
         )
@@ -111,8 +111,8 @@ pipeline {
         stage('Deploy to artifacts.cibseven.org') {
             when {
                 allOf {
-                    expression { params.DEPLOY == true }
-                    expression { params.GPG_KEY_PASSPHRASE.toString().isEmpty() }
+                    expression { params.DEPLOY_TO_ARTIFACTS }
+                    expression { !params.DEPLOY_TO_MAVEN_CENTRAL }
                 }
             }
             steps {
@@ -127,7 +127,7 @@ pipeline {
         stage('Deploy to Maven Central') {
             when {
                 allOf {
-                    expression { params.DEPLOY_TO_MAVEN_CENTRAL == true }
+                    expression { params.DEPLOY_TO_MAVEN_CENTRAL }
                     expression { mavenProjectInformation.version.endsWith("-SNAPSHOT") == false }
                 }
             }
@@ -145,7 +145,7 @@ pipeline {
                                     -Dgpg.passphrase="${GPG_KEY_PASS}" \
                                     clean deploy \
                                     -Psonatype-oss-release \
-                                    -Dskip.cibseven.release="${!params.DEPLOY}" \
+                                    -Dskip.cibseven.release="${!params.DEPLOY_TO_ARTIFACTS}" \
                                     -DskipTests
                             """
                         }
