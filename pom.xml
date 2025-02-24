@@ -67,15 +67,6 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-jar-plugin</artifactId>
           <version>${plugin.version.jar}</version>
-          <configuration>
-            <useDefaultManifestFile>true</useDefaultManifestFile>
-            <archive>
-              <!-- explicitly specify manifestFile because otherwise it overrides the generated one from bundle-plugin -->
-              <manifest>
-                <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-              </manifest>
-            </archive>
-          </configuration>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
