@@ -4,7 +4,7 @@
   
         <servers>
                 <server>
-                        <id>central</id>
+                        <id>central-community</id>
                         <username>${community.username}</username>
                         <password>${community.password}</password>
                 </server>
