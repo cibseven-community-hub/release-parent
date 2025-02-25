@@ -2,7 +2,7 @@ CIB seven Community Release Parent
 ===================
 
 [![License](https://img.shields.io/github/license/cibseven/cibseven?color=blue&logo=apache)](https://github.com/cibseven-community-hub/release-parent/blob/master/LICENSE)
-[![Discussions](https://img.shields.io/badge/discussions-cibseven-green)](https://github.com/orgs/cibseven/discussions)
+[![Discussions](https://img.shields.io/badge/discussions-cibseven-green)](https://github.com/orgs/cibseven-community-hub/discussions)
  
 ## cibseven-community-release-parent
 
