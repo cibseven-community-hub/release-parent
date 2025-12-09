@@ -4,7 +4,7 @@
 
   <groupId>org.cibseven.community</groupId>
   <artifactId>release-parent</artifactId>
-  <version>2.0.0-SNAPSHOT</version>
+  <version>1.1.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>CIB seven Community - Release Parent Pom</name>
 
@@ -23,11 +23,11 @@
     <skip.cibseven.release>false</skip.cibseven.release>
     <skip.central.release>false</skip.central.release>
 	
-    <nexus.snapshot.repository.id>mvn-cibseven-snapshots</nexus.snapshot.repository.id>
-    <nexus.snapshot.repository>https://artifacts.cibseven.org/repository/snapshots</nexus.snapshot.repository>
+    <nexus.snapshot.repository.id>mvn-cibseven-community-snapshots</nexus.snapshot.repository.id>
+    <nexus.snapshot.repository>https://artifacts.cibseven.org/repository/community-snapshots</nexus.snapshot.repository>
 	
-    <nexus.release.repository.id>mvn-cibseven-public</nexus.release.repository.id>
-    <nexus.release.repository>https://artifacts.cibseven.org/repository/public</nexus.release.repository>
+    <nexus.release.repository.id>mvn-cibseven-community</nexus.release.repository.id>
+    <nexus.release.repository>https://artifacts.cibseven.org/repository/community</nexus.release.repository>
 
     <nexus.sonatype.url>https://central.sonatype.com</nexus.sonatype.url>
 	
