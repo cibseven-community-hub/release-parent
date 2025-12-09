@@ -18,7 +18,7 @@ Alternatively, you can pull it from the central Maven repositories:
 <dependency>
   <groupId>org.cibseven.community</groupId>
   <artifactId>release-parent</artifactId>
-  <version>1.0.0</version>
+  <version>2.1.0-SNAPSHOT</version>
 </dependency>
 ```
 
