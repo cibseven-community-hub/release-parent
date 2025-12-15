@@ -23,11 +23,11 @@
     <skip.cibseven.release>false</skip.cibseven.release>
     <skip.central.release>false</skip.central.release>
 	
-    <nexus.snapshot.repository.id>mvn-cibseven-snapshots</nexus.snapshot.repository.id>
-    <nexus.snapshot.repository>https://artifacts.cibseven.org/repository/snapshots</nexus.snapshot.repository>
-	
-    <nexus.release.repository.id>mvn-cibseven-public</nexus.release.repository.id>
-    <nexus.release.repository>https://artifacts.cibseven.org/repository/public</nexus.release.repository>
+    <nexus.community-snapshot.repository.id>mvn-cibseven-community-snapshots</nexus.community-snapshot.repository.id>
+    <nexus.community-snapshot.repository>https://artifacts.cibseven.org/repository/community-snapshots</nexus.community-snapshot.repository>
+
+    <nexus.community-release.repository.id>mvn-cibseven-community</nexus.community-release.repository.id>
+    <nexus.community-release.repository>https://artifacts.cibseven.org/repository/community</nexus.community-release.repository>
 
     <nexus.sonatype.url>https://central.sonatype.com</nexus.sonatype.url>
 	
@@ -105,12 +105,12 @@
   
   <distributionManagement>
     <snapshotRepository>
-      <id>${nexus.snapshot.repository.id}</id>
-      <url>${nexus.snapshot.repository}</url>
+      <id>${nexus.community-snapshot.repository.id}</id>
+      <url>${nexus.community-snapshot.repository}</url>
     </snapshotRepository>
     <repository>
-      <id>${nexus.release.repository.id}</id>
-      <url>${nexus.release.repository}</url>
+      <id>${nexus.community-release.repository.id}</id>
+      <url>${nexus.community-release.repository}</url>
     </repository>
   </distributionManagement>
   
@@ -238,7 +238,7 @@
       </snapshots>
     </repository>
     <repository>
-      <!-- Required for local builds by community users on main branch -->
+      <!-- Required for local builds by community users on main branch (old versions)-->
       <id>mvn-cibseven-public</id>
       <name>CIB seven Public Repository</name>
       <url>https://artifacts.cibseven.org/repository/public</url>
@@ -247,14 +247,34 @@
       </snapshots>
     </repository>
     <repository>
-      <!-- Required for local builds by developers on maintainance branches -->
+      <!-- Required for local builds by community users on main branch -->
+      <id>${nexus.community-release.repository.id}</id>
+      <name>CIB seven Community Public Repository</name>
+      <url>${nexus.community-release.repository}</url>
+	  <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+    <repository>
+      <!-- Required for local builds by developers on maintainance branches (old versions) -->
       <id>mvn-cibseven-snapshots</id>
       <name>CIB seven Snapshots repository</name>
       <url>https://artifacts.cibseven.org/repository/snapshots</url>
-	  <releases>
+      <releases>
         <enabled>false</enabled>
       </releases>
-	  <snapshots>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
+    <repository>
+      <!-- Required for local builds by developers on maintainance branches -->
+      <id>${nexus.community-snapshot.repository.id}</id>
+      <url>${nexus.community-snapshot.repository}</url>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+      <snapshots>
         <enabled>true</enabled>
       </snapshots>
     </repository>
